@@ -22,7 +22,7 @@ def create_break_pattern():
 def break_syllables(line):
     """Applies syllable breaking rules to a line."""
     break_pattern = create_break_pattern()
-    separator = '|'
+    separator = ' '
     line = re.sub(r'\s+', ' ', line.strip())
     segmented_line = break_pattern.sub(separator + r"\1", line)
 

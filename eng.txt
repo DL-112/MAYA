@@ -1,0 +1,1 @@
+If you still experience freezing after trying the above suggestions, please provide more details about the file size and any specific error messages or behaviors you observe. This additional context can help diagnose the issue more effectively.
