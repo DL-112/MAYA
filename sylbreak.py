@@ -19,6 +19,7 @@ def create_break_pattern():
         + r"|[" + en_char + other_char + r"])"
     )
 
+# main function to use sylbreak.py
 def break_syllables(line):
     """Applies syllable breaking rules to a line."""
     break_pattern = create_break_pattern()
