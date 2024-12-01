@@ -1,6 +1,7 @@
 import random
 import sylbreak as sb
 from collections import defaultdict
+import pickle
 
 def load_text(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -35,9 +36,15 @@ def generate_text(probabilities, start_word, num_words=50):
         start_word = current_word
     return ' '.join(output)
 
+# Save the probabilities (bigram model) to a file
+def save_bigram_model(probabilities, filename='bigram_model.pkl'):
+    with open(filename, 'wb') as f:
+        pickle.dump(probabilities, f)
+
 # Main function to run the model
 def train_bigram(file_path):
     words = load_text(file_path)
     bigrams = generate_bigrams(words)
     probabilities = calculate_probabilities(bigrams)
+    save_bigram_model(probabilities)
     return probabilities

@@ -9,8 +9,18 @@ def load_text(file_path):
         text = file.read()
     # text = sb.break_syllables(text)
     text = wordSegmenter.normalize_break(text, 'unicode', wordSegmenter.SegmentationMethod.sub_word_possibility)
-    print("pass")
     return text
+
+def load_text_from_file(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+
+    # Process each line into a list of words, stripping any extra spaces
+    word_lists = [line.strip().split(',') for line in lines]
+
+    # Clean up any extra spaces around words and flatten the list
+    word_lists = [word.strip() for word_list in word_lists for word in word_list]
+    return word_lists
 
 def generate_bigrams(words):
     bigrams = defaultdict(lambda: defaultdict(int))
@@ -41,7 +51,9 @@ def generate_text(probabilities, start_word, num_words=50):
 
 # Main function to run the model
 def train_bigram(file_path):
-    words = load_text(file_path)
+    # words = load_text(file_path)
+    words = load_text_from_file("shwe_u_daung_S.txt")
     bigrams = generate_bigrams(words)
     probabilities = calculate_probabilities(bigrams)
+    # print(probabilities)
     return probabilities

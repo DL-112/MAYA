@@ -3,8 +3,19 @@ from collections import defaultdict
 from enum import Enum
 from word_breaker.Rabbit import zg2uni
 from word_breaker.myparser import MyParser
+import pickle
 
 import os
+
+def debug(msges, file_path):
+    with open(file_path, "a", encoding="utf-8") as f:
+        for msg in msges:
+            f.write(f"{msg}, ")
+        f.write("\n")
+
+def debug2(msges, file_path):
+    with open(file_path, "a", encoding="utf-8") as f:
+        f.write(f"{msges}\n")
 
 class WordSegment:
     # Word Segmentation Ways
@@ -52,6 +63,16 @@ class WordSegment:
             self._found_words.add(word)
 
         return found
+    
+    # Load the probabilities (bigram model) from a file
+    def load_bigram_model(self, filename='bigram_model.pkl'):
+        # Make sure file exists
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"Bigram model file '{filename}' not found.")
+        
+        with open(filename, 'rb') as f:
+            probabilities = pickle.load(f)
+        return probabilities
 
     # simple left to right maximum longest matching
     def _left_to_right_segment(self, seq, maxlen):
@@ -129,23 +150,23 @@ class WordSegment:
 
         return combos
 
-    # calulate mutual information of two syllables
     def _cal_mutual_info(self, sya1, sya2):
-        # calculating unigram probability
-        occurence_of_syllable_1 = self._mypos_corpus.count(sya1)
-        probability_of_syllable_1 = occurence_of_syllable_1 / self._total_unigram_count
+        # Calculate mutual information using preloaded bigram/unigram counts
+        probabilities = self.load_bigram_model()
 
-        occurence_of_syllable_2 = self._mypos_corpus.count(sya2)
-        probability_of_syllable_2 = occurence_of_syllable_2 / self._total_unigram_count
-
-        # calculating bigram probability
-        occurence_of_bigram = self._mypos_corpus.count(sya1 + sya2)
-        probability_of_bigram = occurence_of_bigram / self._total_bigram_count
-
-        if probability_of_bigram == 0:
+        # Get the count of the bigram (pair of syllables)
+        bigram_count = probabilities.get(sya1, {}).get(sya2, 0)
+        
+        # Get the total unigram count for the first syllable (sya1)
+        total_count_sya1 = sum(probabilities.get(sya1, {}).values())
+        
+        # If bigram_count or total_count_sya1 is zero, return 0 to avoid division by zero
+        if bigram_count == 0 or total_count_sya1 == 0:
             return 0
+        
+        # Calculate the mutual information
+        return log(bigram_count / float(total_count_sya1), 2)
 
-        return log(probability_of_bigram / float(probability_of_syllable_1 * probability_of_syllable_2), 2)
 
     def filter_minimum_combination(self, solutions):
         # retrieving minimum number of merged words
@@ -202,7 +223,12 @@ class WordSegment:
         # shortest length = shortest word combinations count
         for n in range(start_word_position, shortest_length):
             result = combo[0:n]
-            word = combo[n]
+            if n < len(combo):
+                word = combo[n]
+            else:
+                # Handle the case where n is out of bounds
+                return  # Or continue, or handle as needed
+
             seq = self.m.syllable(word)
 
             offset = 0
@@ -228,6 +254,9 @@ class WordSegment:
             pointer += len(seq)
 
     def break_words(self, input, segmentation_method):
+        # Clear the previous combinations
+        self._possible_combos = []
+
         # Breaking up words into syllables
         input = self.m.syllable(input)
 
@@ -240,8 +269,10 @@ class WordSegment:
             self._make_sub_word_combinations(input, combo, len(combo))
 
         min_filtered_combos = self.filter_minimum_combination(self._possible_combos)
+
         if len(min_filtered_combos) > 1:
             syllable_collocation_strengths = self._calculate_sentence_collocation_strength(min_filtered_combos)
+            debug2(syllable_collocation_strengths, "input.txt")
             strongest = 0
             strongest_sentence = ''
             # comb => [strength , sentence]
@@ -262,6 +293,7 @@ class WordSegment:
 
         # normalize the input text
         input_text = input_text.replace(u" ", "")
+        input_text = input_text.replace(u"\n", "")
         inputs = input_text.split("။")
 
         outputs = []
@@ -269,6 +301,7 @@ class WordSegment:
         for input in inputs:
             if input:
                 segmented_sentence = self.break_words(input, segmentation_method)
+                # debug2(segmented_sentence, "output.txt")
+                debug(segmented_sentence, "shwe_u_daung_S.txt")
                 outputs.append(segmented_sentence)
-
         return outputs

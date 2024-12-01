@@ -16,7 +16,7 @@ def bigram_predict():
 def bigram_predict_v2():
     file_path = "books/shwe_u_daung.txt"
     probabilities = tb2.train_bigram(file_path)
-    output_text = tb2.generate_text(probabilities, "ကြွယ်", 50)
+    output_text = tb2.generate_text(probabilities, "အကြံဉာဏ်", 50)
     output_text_area.delete("1.0", tk.END)  # Clear previous output
     output_text_area.insert(tk.END, output_text)  # Insert new output
 
