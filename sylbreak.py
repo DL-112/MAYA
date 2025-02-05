@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import re
@@ -36,3 +35,8 @@ def break_syllables(line):
     segmented_line = segmented_line.replace(double_delimiter, " ")
 
     return segmented_line
+
+if __name__ == "__main__":
+    myanmar_text = "မြန်မာစာပေ"
+    segmented_text = break_syllables(myanmar_text)
+    print(segmented_text)
