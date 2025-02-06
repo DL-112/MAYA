@@ -1,5 +1,6 @@
 from sylbreak import break_syllables
 from collections import defaultdict
+import json
 
 def encode_input(input_text, vocab_dict):
     # Replace spaces with "<_>" before syllable breaking
@@ -87,10 +88,12 @@ vocab = set(syllables_list)  # Unique initial tokens
 print(len(vocab))
 
 token_to_id = {token: i for i, token in enumerate(sorted(vocab))}
+with open("tokenizer-v2/vocabs.json", "w", encoding="utf-8") as f:
+    json.dump(token_to_id, f)
 # write_into_file(token_to_id)
-sentence = "ထိုအချက်ကို တွေ့အောင်ရှာတတ်လျှင် ဖြစ်သည်။"
-encoded = encode_input(sentence, token_to_id)
-print(encoded)
-decoded = decode_ids(encoded, token_to_id)
-print(token_to_id.get("<UNK>"))
-write_into_file(decoded)
+# sentence = "ထိုအချက်ကို တွေ့အောင်ရှာတတ်လျှင် ဖြစ်သည်။"
+# encoded = encode_input(sentence, token_to_id)
+# print(encoded)
+# decoded = decode_ids(encoded, token_to_id)
+# print(token_to_id.get("<UNK>"))
+# write_into_file(decoded)
