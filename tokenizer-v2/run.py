@@ -1,5 +1,6 @@
 from sylbreak import break_syllables
 from collections import defaultdict
+import os
 import json
 
 def encode_input(input_text, vocab_dict):
@@ -61,21 +62,17 @@ def write_into_file(data, file_name="tokenizer-v2/screen.txt"):
         f.write(str(data))
 
 # Sample Myanmar corpus
-def read_and_combine_files(file_paths):
-    combined_content = ""
-    
-    for file_path in file_paths:
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                combined_content += f.read() + "\n"  # Adding newline after each file's content
-        except FileNotFoundError:
-            print(f"Error: The file {file_path} was not found.")
-        except Exception as e:
-            print(f"An error occurred while reading {file_path}: {e}")
-    
-    return combined_content
+def read_and_combine_files(directory):
+    combined_text = ""
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        if os.path.isfile(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                combined_text += f.read() + '\n'
+    return combined_text
 
-corpus = read_and_combine_files(["dictionary/common-words.txt", "dictionary/dict-words.txt", "dictionary/stop-words.txt", "dictionary/special-tokens.txt"])
+# Example usage
+corpus = read_and_combine_files('dictionary')
 
 # Step 1: Tokenize into syllables
 syllables_string = break_syllables(corpus)
@@ -88,9 +85,11 @@ vocab = set(syllables_list)  # Unique initial tokens
 print(len(vocab))
 
 token_to_id = {token: i for i, token in enumerate(sorted(vocab))}
-with open("tokenizer-v2/vocabs.json", "w", encoding="utf-8") as f:
-    json.dump(token_to_id, f)
-# write_into_file(token_to_id)
+# with open("tokenizer-v2/vocabs.json", "w", encoding="utf-8") as f:
+#     json.dump(token_to_id, f)
+
+write_into_file(token_to_id)
+
 # sentence = "ထိုအချက်ကို တွေ့အောင်ရှာတတ်လျှင် ဖြစ်သည်။"
 # encoded = encode_input(sentence, token_to_id)
 # print(encoded)
