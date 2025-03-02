@@ -85,8 +85,8 @@ vocab = set(syllables_list)  # Unique initial tokens
 print(len(vocab))
 
 token_to_id = {token: i for i, token in enumerate(sorted(vocab))}
-# with open("tokenizer-v2/vocabs.json", "w", encoding="utf-8") as f:
-#     json.dump(token_to_id, f)
+with open("tokenizer-v2/vocabs.json", "w", encoding="utf-8") as f:
+    json.dump(token_to_id, f)
 
 write_into_file(token_to_id)
 
