@@ -31,7 +31,6 @@ def process_string(input_string):
 
     # Process the string
     updated_string = []
-    count = 10
     for word in input_string.split():
         if is_valid_char(word) and updated_string:
             updated_string[-1] += rearrange_unicode_order(word)  # Merge with the previous word
